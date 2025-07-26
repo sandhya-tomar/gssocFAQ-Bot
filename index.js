@@ -304,6 +304,45 @@ client.login(process.env.BOT_TOKEN).catch(error => {
 app.use('/docs', express.static(path.join(__dirname, 'views')));
 app.use("/docs", documentationRoute);
 
+const fs = require("fs");
+
+app.get("/", (req, res) => {
+  const faqData = JSON.parse(fs.readFileSync("./faqs.json", "utf-8"));
+  const topFaqs = faqData.slice(0, 5);
+
+  const faqCards = topFaqs
+    .map(
+      (faq, i) => `
+    <div style="margin-bottom:20px; border:1px solid #ccc; padding:15px; border-radius:8px;">
+      <h3>${i + 1}. ${faq.question}</h3>
+      <details style="margin-top:10px;"><summary style="cursor:pointer;">Show Answer</summary>
+        <p style="margin-top:10px;">${faq.answer}</p>
+      </details>
+    </div>
+  `
+    )
+    .join("");
+
+  const html = `
+    <html>
+      <head>
+        <title>GSSOC FAQ Homepage</title>
+        <style>
+          body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+          h1 { margin-bottom: 30px; }
+        </style>
+      </head>
+      <body>
+        <h1>📋 Top FAQs</h1>
+        ${faqCards}
+        <p>See full FAQ in the Discord bot using <code>/faq</code> command!</p>
+      </body>
+    </html>
+  `;
+  res.send(html);
+});
+
+
 app.listen(3000, () => {
   console.log("🚀 Running at http://localhost:3000/docs");
 });
