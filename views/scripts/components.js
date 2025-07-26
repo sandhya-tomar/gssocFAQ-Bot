@@ -139,3 +139,25 @@ class Prompt{
     }
 
 }
+// Load FAQs dynamically from faqs.json and show on homepage
+fetch('/faqs.json')
+  .then(res => res.json())
+  .then(faqs => {
+    const faqContainer = document.getElementById('faq-section');
+    if (!faqContainer) return;
+
+    const topFaqs = faqs.slice(0, 5);
+    faqContainer.innerHTML = `
+      <h2>📋 Frequently Asked Questions</h2>
+      ${topFaqs.map(faq => `
+        <div style="border:1px solid #ccc; padding:15px; margin:10px 0; border-radius:8px;">
+          <h4>${faq.question}</h4>
+          <details>
+            <summary>Show Answer</summary>
+            <p style="margin-top:10px;">${faq.answer}</p>
+          </details>
+        </div>
+      `).join('')}
+    `;
+  })
+  .catch(err => console.error('Failed to load FAQs:', err));
